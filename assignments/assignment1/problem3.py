@@ -118,8 +118,22 @@ def check_collision(q, box_position, box_half_extents):
     #        box_half_extents: half extents of the collision region
     # output: in_collision: True if the robot is in collision region, False otherwise
     # ------ TODO Student answer below -------
-    print('TODO check_collision')
-    return False
+    #print('TODO check_collision')
+    e1, _ = calculate_FK(q, joint=1)
+    e2, _ = calculate_FK(q, joint=2)
+    e3, _ = calculate_FK(q, joint=3)
+
+    def condition(effector, box_position, box_half_extents):
+        condition_x = box_position[0]-box_half_extents[0] < effector[0] < box_position[0]+box_half_extents[0]
+        condition_y = box_position[1]-box_half_extents[1] < effector[1] < box_position[1]+box_half_extents[1]
+        condition_z = box_position[2]-box_half_extents[2] < effector[2] < box_position[2]+box_half_extents[2]
+        if condition_x and condition_y and condition_z:
+            return True
+    
+    if condition(e1, box_position, box_half_extents) or condition(e2, box_position, box_half_extents) or condition(e3, box_position, box_half_extents):
+        return True
+    else:
+        return False
     # ------ Student answer above -------
 
 
@@ -160,17 +174,17 @@ wait_for_enter()
 # ##########################################
 
 # ------ TODO Student answer below -------
-for i in range(1000):
+for i in range(1001):
     # sample a random configuration q
     # TODO
-
+    q = sample_configuration()
     # move robot into configuration q
     robot.control(q, set_instantly=True)
     m.step_simulation(realtime=True)
 
     # calculate ee_position, ee_orientation using calculate_FK
     # TODO
-
+    ee_position, _ = calculate_FK(q, joint=3)
     # plot workspace as points of the end effector
     plot_point(ee_position)
 # ------ Student answer above -------
