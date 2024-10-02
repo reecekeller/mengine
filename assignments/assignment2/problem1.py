@@ -16,11 +16,7 @@ np.set_printoptions(precision=4, suppress=True)
 def rotation_matrix_to_quaternion(R: np.ndarray) -> np.ndarray:
     """Convert rotation matrix R (3x3) to quaternion q (1x4)."""
     # input: R: rotation matrix
-    # output: q: quaternion
-
-def rotation_matrix_to_quaternion(R: np.ndarray) -> np.ndarray:
-    """Convert rotation matrix R (3x3) to quaternion q (1x4)."""
-    q = np.zeros(4)
+    # output: q: quaternion    q = np.zeros(4)
     if R[2, 2] < 0:
         if (R[0, 0] > R[1, 1]):
             q[0] = 1 + R[0, 0] - R[1, 1] - R[2, 2]
@@ -168,6 +164,8 @@ if __name__ == '__main__':
         # rotate using quaternion and the hamilton product
         # ------ TODO Student answer below -------
         q_star = q[0]-q
+        #q_star = -q
+        #q_star[0] = q[0]
         x_q = np.array([x[0], x[1], x[2], 0])
         prod = hamilton_product(q_star, x_q)
         x_new_q = hamilton_product(q, prod)
