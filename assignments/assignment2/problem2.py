@@ -29,7 +29,6 @@ def sample_configuration():
     # output: q: joint angles of the robot
     return np.random.uniform(low=[-np.pi, -np.pi/2, -np.pi/2], high=[np.pi/2, np.pi/2, np.pi/2])
 
-
 def get_exp_coordinates(omega, v, theta):
     # NOTE It can be helpful to implement and use this function,
     # but it is not required. You can also perform all calculations in calculate_FK.
@@ -41,7 +40,13 @@ def get_exp_coordinates(omega, v, theta):
     #        theta: angle of rotation
     # output: E: exponential coordinates of the screw (4x4 matrix)
     # ------ TODO Student answer below -------
-    return np.eye(4)
+    omega_mat = np.array([[0, -omega[2], omega[1]],
+                          [omega[2], 0, -omega[0]],
+                          [-omega[1], omega[0], 0]])
+    S = np.eye(4)
+    S[:3, :3] = expm(omega_mat * theta)  
+    S[:3, 3] = (theta*np.eye(3)+(1-np.cos(theta)) * omega_mat+(theta-np.sin(theta))*(omega_mat@omega_mat))@np.array(v)
+    return S
     # ------ Student answer above -------
 
 
@@ -55,7 +60,21 @@ def calculate_FK(q, joint=3):
     #         ee_orientation: orientation of the end effector as a quaternion
     # ------ TODO Student answer below -------
     # orientation = m.get_quaternion(orientation) # NOTE: If you used transformation matrices, call this function to get a quaternion
-    return np.zeros(3), np.array([0, 0, 0, 1])
+    S1 = np.array([[0, 0, 1], [0, 0, 0]])
+    S2 = np.array([[1, 0, 0], [0, 0.5, 0]])        
+    S3 = np.array([[1, 0, 0], [0, 0.9, 0]])        
+
+    ee_1 = get_exp_coordinates(S1[0], S1[1], q[0])
+    ee_2 = get_exp_coordinates(S2[0], S2[1], q[1])
+    ee_3 = get_exp_coordinates(S3[0], S3[1], q[2])
+
+    M = np.eye(4)
+    M[2, 3]=1.2
+    T = ee_1 @ ee_2 @ ee_3 @ M
+    xyz = T[:3, 3]
+    R = T[:3, :3]
+    q = m.get_quaternion(R)
+    return xyz, q
     # ------ Student answer above -------
 
 

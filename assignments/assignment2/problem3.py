@@ -4,13 +4,25 @@ import mengine as m
 import numpy as np
 
 
+def q_to_R(q: np.ndarray):
+    q0 = q[3]; q1 = q[0]; q2 =q[1]; q3 = q[2]
+    R = np.array([[q0**2 + q1**2 - q2**2 - q3**2, 2*(q1*q2-q0*q3), 2*(q1*q3+q0*q2)], 
+                  [2*(q1*q2+q0*q3), q0**2-q1**2+q2**2-q3**2, 2*(q2*q3-q0*q1)],
+                  [2*(q1*q3-q0*q2), 2*(q2*q3-q0*q1), q0**2-q1**2-q2**2+q3**2]])
+    return R
+
 def invertQ(q):
     """
     Invert a quaternion, this function is optional and you could use it in line_intersection if you want
     """
     # ------ TODO Student answer below -------
+<<<<<<< HEAD
     # NOTE: Optional, you do not need to use this function
     return np.array([0, 0, 0, 1])
+=======
+    q_star = np.array([-q[0], -q[1], -q[2], -q[3]]) 
+    return q_star / np.linalg.norm(q_star)**2
+>>>>>>> 81de652ecef227d66a0351ef09dffbbd6d6bce0d
     # ------ Student answer above -------
 
 
@@ -20,7 +32,16 @@ def line_intersection(p1, p2, q1, q2):
     If there is an intersection, returns the point. Otherwise, returns None.
     """
     # ------ TODO Student answer below -------
-    return None
+    a = p2-p1
+    b = q2-q1
+    A = np.array([a, -b]) 
+    x = q1 - p1  
+    (t, s), _, _, _ = np.linalg.lstsq(A.T, x)
+    if 0 <= t <= 1 and 0 <= s <= 1:
+        p_int = p1+t*a
+        return p_int
+    else:
+        return None
     # ------ Student answer above -------
 
 
@@ -93,6 +114,35 @@ for i in range(10000):
         for body, point_local in zip(intersect_points_local_bodies, intersect_points_local):
             p, _ = fbl.local_to_global_coordinate_frame(point_local, link=3)
             body.set_base_pos_orient(p)
+<<<<<<< HEAD
+=======
+
+            ## old code before assignment update
+        #         q = fbl.get_link_pos_orient(4)[1]
+        #         xyz = fbl.get_link_pos_orient(4)[0]
+        #         #q_inv = invertQ(q)
+        #         R_inv = q_to_R(q)
+        #         local_intersect_point = R_inv @ (intersect_point-xyz)
+        #         # ------ Student answer above -------
+
+        #         intersect_points_local.append(local_intersect_point)
+        #         # get global coordinates of intersection point
+        #         intersect_point_local_body = m.Shape(m.Sphere(radius=0.005), static=True,
+        #                                              position=intersect_point, collision=False, rgba=[0, 1, 0, 1])                
+        #         intersect_points_local_bodies.append(
+        #             intersect_point_local_body)
+
+        # # redraw intersection points of moving centrode
+        # # ------ TODO Student answer below -------
+        # # Hint: You can use Body.set_base_pos_orient(xyz) to update a body's position
+        # for body, point_local in zip(intersect_points_local_bodies, intersect_points_local):
+        #     q = fbl.get_link_pos_orient(4)[1]
+        #     xyz = fbl.get_link_pos_orient(4)[0]
+        #     R = q_to_R(invertQ(q)) 
+        #     global_point = R @ point_local  + xyz  
+        #     body.set_base_pos_orient(global_point)
+                            # ------ Student answer above -------
+>>>>>>> 81de652ecef227d66a0351ef09dffbbd6d6bce0d
 
     m.step_simulation(realtime=True)
 

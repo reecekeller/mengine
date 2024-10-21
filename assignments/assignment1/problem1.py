@@ -29,8 +29,8 @@ def rodrigues_formula(n, x, theta):
     # Rodrigues' formula for axis-angle: rotate a point x around an axis n by angle theta
     # input: n, x, theta: axis, point, angle
     # output: x_new: new point after rotation
-    # ------ TODO Student answer below -------
-    return np.zeros(3)
+    #n = n/np.linalg.norm(n)
+    return n * np.dot(n, x) + np.sin(theta) * np.cross(n, x) - np.cos(theta) * np.cross(n, np.cross(n, x))
     # ------ Student answer above -------
 
 
@@ -40,7 +40,20 @@ def rotate_euler(alpha, beta, gamma, x):
     # output: x_new: new point after rotation
 
     # ------ TODO Student answer below -------
-    return np.zeros(3)
+    R_23 = np.eye(3)
+    R_23[0, 0] = np.cos(gamma); R_23[0, 1] = -np.sin(gamma)
+    R_23[1, 0] = np.sin(gamma); R_23[1, 1] = np.cos(gamma)
+    
+    R_12 = np.eye(3)
+    R_12[0, 0] = np.cos(beta); R_12[0, 2] = np.sin(beta)
+    R_12[2, 0] = -np.sin(beta); R_12[2, 2] = np.cos(beta)
+
+    R_01 = np.eye(3)
+    R_01[0, 0] = np.cos(alpha); R_01[0, 1] = -np.sin(alpha)
+    R_01[1, 0] = np.sin(alpha); R_01[1, 1] = np.cos(alpha)
+    
+    R_03 = R_01 @ R_12 @ R_23
+    return np.dot(R_03, x)
     # ------ Student answer above -------
 
 
@@ -50,7 +63,20 @@ def euler_to_rotation_matrix(alpha, beta, gamma):
     # output: R: rotation matrix
 
     # ------ TODO Student answer below -------
-    return np.zeros((3,3))
+    R_23 = np.eye(3)
+    R_23[0, 0] = np.cos(gamma); R_23[0, 1] = -np.sin(gamma)
+    R_23[1, 0] = np.sin(gamma); R_23[1, 1] = np.cos(gamma)
+    
+    R_12 = np.eye(3)
+    R_12[0, 0] = np.cos(beta); R_12[0, 2] = np.sin(beta)
+    R_12[2, 0] = -np.sin(beta); R_12[2, 2] = np.cos(beta)
+
+    R_01 = np.eye(3)
+    R_01[0, 0] = np.cos(alpha); R_01[0, 1] = -np.sin(alpha)
+    R_01[1, 0] = np.sin(alpha); R_01[1, 1] = np.cos(alpha)
+    
+    R_03 = R_01 @ R_12 @ R_23
+    return R_03
     # ------ Student answer above -------
 
 
@@ -59,7 +85,17 @@ def euler_to_axis_angle(alpha, beta, gamma):
     # input: alpha, beta, gamma: euler angles
     # output: n, theta
     # ------ TODO Student answer below -------
-    return np.zeros(3), 0
+    R = euler_to_rotation_matrix(alpha, beta, gamma)
+    theta = np.arccos((np.trace(R)-1)/2)
+    n_x = (R[2, 1] - R[1, 2])/(2*np.sin(theta))
+    n_y = (R[0, 2] - R[2, 0])/(2*np.sin(theta))
+    n_z = (R[1, 0] - R[0, 1])/(2*np.sin(theta))
+    n = np.array([n_x, n_y, n_z])
+    #n = n/np.linalg.norm(n)
+    return n, theta
+    # else:
+    #     print("R is the identity matrix")
+    #     return np.zeros(3), 0
     # ------ Student answer above -------
 
 

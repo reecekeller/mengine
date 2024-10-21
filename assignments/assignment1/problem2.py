@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import mengine as m
+
 np.set_printoptions(precision=3, suppress=True)
 
 # NOTE: This assignment asks you to test rotations and translations in varying order.
@@ -19,6 +20,28 @@ orient = np.eye(3)
 box = m.Shape(m.Box(half_extents=[0.1, 0.2, 0.05]), static=True,
               position=pos, orientation=m.get_quaternion(orient), rgba=[0, 1, 0, 1])
 
+
+def euler_to_rotation_matrix(alpha, beta, gamma):
+    # Convert euler angles (alpha, beta, gamma) to rotation matrix
+    # input: alpha, beta, gamma: euler angles
+    # output: R: rotation matrix
+
+    # ------ TODO Student answer below -------
+    R_23 = np.eye(3)
+    R_23[0, 0] = np.cos(gamma); R_23[0, 1] = -np.sin(gamma)
+    R_23[1, 0] = np.sin(gamma); R_23[1, 1] = np.cos(gamma)
+    
+    R_12 = np.eye(3)
+    R_12[0, 0] = np.cos(beta); R_12[0, 2] = np.sin(beta)
+    R_12[2, 0] = -np.sin(beta); R_12[2, 2] = np.cos(beta)
+
+    R_01 = np.eye(3)
+    R_01[0, 0] = np.cos(alpha); R_01[0, 1] = -np.sin(alpha)
+    R_01[1, 0] = np.sin(alpha); R_01[1, 1] = np.cos(alpha)
+    
+    R_03 = R_01 @ R_12 @ R_23
+    return R_03
+
 def apply_transform(pos, orient, d, euler):
     # transform a box using translation d and rotation given by euler angles
     # input: pos, orient: current position and orientation (rotation matrix) of the box
@@ -26,7 +49,9 @@ def apply_transform(pos, orient, d, euler):
     #        euler: target rotation in euler angles
     # output: pos_new, orient_new: new position and orientation (rotation matrix) of the box
     # ------ TODO Student answer below -------
-    return np.zeros(3), np.eye(3)
+
+    R = euler_to_rotation_matrix(*euler)
+    return R@pos + d, R@orient
     # ------ Student answer above -------
 
 def wait_for_enter():
