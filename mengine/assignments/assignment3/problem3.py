@@ -70,47 +70,31 @@ def extend(tree, target):
 def random_sample_config():
     return np.random.uniform(robot.ik_lower_limits[:7], robot.ik_upper_limits[:7])
 
-# reached = False
-#             trapped  = False
-#             advanced = False
-#             pp_node = closest_node
-#             while advanced:
-#                 pp_node, success = extend(T_b, pp_node.angles)
-#                 reached = np.allclose(pp_node.angles, T_b[-1].angles)
-#                 trapped = not success
-#                 advanced = not reached and not trapped
-#             # If successful:
-#                 # 4: Return the computed path
-#             if success:
-#                 path = pp_node.retrace()
-#                 path_angles = [node.angles for node in path]
-#                 return path_angles
-
 def rrt_connect(init, goal, max_iterations=100):
     """Returns a path from init to goal, using rrt_connect method.
     reference: http://www.kuffner.org/james/papers/kuffner_icra2000.pdf
     """
+    "Debugged algorithm with the help of TA and Aden Eagle"
     """TODO: Your Answer HERE"""
     T_a, T_b = [Node(init)], [Node(goal)]
     # At each iteration for k iterations:
     for _ in range(max_iterations):
         # 2. Sample a random configuration, qrand, and attempt to extend T_a towards it to yield a new node
         qrand = random_sample_config()
-        closest_node_a, success = extend(T_a, qrand)
+        node_a, success = extend(T_a, qrand)
         # If successful:
         if success:
             # 3. Try to connect `Tb` to the new node, yielding a second new node
-            intermediate_node = closest_node_a
-            success_inner = False
-            intermediate_node, success_inner = extend(T_b, closest_node_a.angles)
+            temp_node, temp_success = extend(T_b, node_a.angles)
             # If successful:
                 # 4: Return the computed path
-            if success_inner:
-                path = closest_node_a.retrace() + intermediate_node.retrace()[::-1]
-                path_angles = [node.angles for node in path]
-                if np.allclose(path_angles[-1], init):
-                    return path_angles[::-1]
-                return path_angles
+            if temp_success:
+                path_nodes = node_a.retrace()
+                path_nodes += temp_node.retrace()[::-1]
+                angles = [node.angles for node in path_nodes]
+                if np.allclose(angles[-1], init):
+                    return angles[::-1]
+                return angles
             
         # 6. Swap trees T_a and T_b after each iteration
         temp = T_a

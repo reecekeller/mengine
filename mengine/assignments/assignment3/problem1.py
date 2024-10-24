@@ -43,7 +43,7 @@ def reset(scenario=0, n_steps=5, step_size=0.1):
     if scenario == 1.1:
         s1 = add_contact_point([-0.1 - radius_contact_spheres, 0, 0])
         s2 = add_contact_point([0.06, 0.08 + radius_contact_spheres, 0])
-        #s3 = add_contact_point([0.25, 0.05, 0])
+        s3 = add_contact_point([0.25, 0.05, 0])
     if scenario == 1.2:
         s1 = add_contact_point([-0.1 - radius_contact_spheres, 0, 0])
         s2 = add_contact_point([0.06, 0.08 + radius_contact_spheres, 0])
