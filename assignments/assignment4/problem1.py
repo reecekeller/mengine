@@ -31,19 +31,17 @@ def reset():
     obstacle2 = m.Shape(m.Box(half_extents=[0.2, 0.18, 0.01]), static=True, position=[
                         0.9, 0.75, 0.0], rgba=[1, 1, 0, 1])
 
-    m.step_simulation(realtime=True)
 
 # ------ TODO Student answer below -------
     # hints: if robot.get_contact_points() is not None, then robot is in collision.
-    for i in range(1000):
-        random_position = np.random.rand(3)
+    for _ in range(1000):
+        random_position = np.random.uniform(low=0.2, high=1.3, size=3)
         random_position[-1] = 0.0
         moveto(robot, robot_marker, random_position)
+        m.step_simulation(realtime=True)
+
         if robot.get_contact_points() is not None:
-            print("Robot is in collision")
-        else:
-            pos = robot.get_base_pos_orient()[0]
-            m.Shape(m.Sphere(radius=0.01), static=True, collision=False, position=pos, rgba=[1, 0, 0, 1])
+            m.Shape(m.Sphere(radius=0.01), static=True, collision=False, position=random_position, rgba=[1, 0, 0, 1])
 
     # you can draw points to the simulation scene at a position by calling
     # m.Shape(m.Sphere(radius=0.01), static=True, collision=False,

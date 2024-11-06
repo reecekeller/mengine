@@ -82,9 +82,11 @@ def get_antipodal_score(robot_joint_angles, pc, normals) -> float:
     right_bound = np.all(points < half_extents, axis=-1)
     indices = np.logical_and(left_bound, right_bound)
     normals_in_gripper = normals[indices]
-
+    gripper_line_vector = robot.local_to_global_coordinate_frame([0, 0.2, 0], link=robot.end_effector)[0]
+    gripper_line_vector = gripper_line_vector - p
+    gripper_line_vector = gripper_line_vector / np.linalg.norm(gripper_line_vector)
     if len(normals_in_gripper) > 0:
-        score = np.mean(np.dot(normals_in_gripper, gripper_line_vector))
+        score = np.mean(np.abs(np.dot(normals_in_gripper, gripper_line_vector)))
 
     # ------ Student answer above -------
 
@@ -113,10 +115,10 @@ def find_best_grasp(obj, **kwargs) -> np.ndarray:
     pc, normals = get_point_cloud(obj)
     ee_poses = sample_grasp_ee_poses(obj, max_sample)
     best_robot_joint_angles = None
-
+    best_score = 0
     for ee_pose in ee_poses:
-        best_score = 0
-        robot_joint_angles = robot.ik(robot.end_effector, target_pos=ee_pose[0], target_orient=ee_pose[1], use_current_joint_angles=True)
+        robot_joint_angles = robot.ik(robot.end_effector, target_pos=ee_pose[0], target_orient=ee_pose[1], 
+                                      use_current_joint_angles=True)
         score = get_antipodal_score(robot_joint_angles, pc, normals)
         if score > best_score and score > min_score:
             best_score = score

@@ -65,8 +65,6 @@ def get_contact_screw(contact_location, contact_normal):
     return contact_screw
     # ------ Student answer above -------
 
-    return contact_screw
-
 
 
 reset()
