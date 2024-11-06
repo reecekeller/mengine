@@ -31,7 +31,13 @@ def sample_grasp_ee_poses(obj, num_samples=100) -> List[Tuple[np.ndarray, np.nda
     """
     # ------ TODO Student answer below -------
     # Note: If you want, the following code can give you a bounding box for the object: obj_min, obj_max = obj.get_AABB()
-    raise NotImplementedError
+    obj_min, obj_max = obj.get_AABB()
+    ee_poses = []
+    for _ in range(num_samples):
+        position = np.random.uniform(obj_min, obj_max)
+        orientation = m.get_quaternion(np.array([np.pi, 0, 0]))
+        ee_poses.append((position, orientation))
+    return ee_poses
     # ------ Student answer above -------
 
 
@@ -69,8 +75,17 @@ def get_antipodal_score(robot_joint_angles, pc, normals) -> float:
 
     # ------ TODO Student answer below -------
     # Hint: example code for computing an antipodal grasp score can be found in lecture12_antipodal.py
+    p, o = robot.get_link_pos_orient(robot.end_effector)
+    antipodal_region.set_base_pos_orient(p, o)
+    points = np.array([antipodal_region.global_to_local_coordinate_frame(p)[0] for p in pc])
+    left_bound = np.all(points > -half_extents, axis=-1)
+    right_bound = np.all(points < half_extents, axis=-1)
+    indices = np.logical_and(left_bound, right_bound)
+    normals_in_gripper = normals[indices]
 
-    raise NotImplementedError
+    if len(normals_in_gripper) > 0:
+        score = np.mean(np.dot(normals_in_gripper, gripper_line_vector))
+
     # ------ Student answer above -------
 
     # Restore robot to previous configuration
@@ -93,7 +108,22 @@ def find_best_grasp(obj, **kwargs) -> np.ndarray:
         robot_joint_angles: Robot joint angles to grasp the object
     """
     # ------ TODO Student answer below -------
-    raise NotImplementedError
+    max_sample = kwargs.get('max_sample', 100)
+    min_score = kwargs.get('min_score', 0.5)
+    pc, normals = get_point_cloud(obj)
+    ee_poses = sample_grasp_ee_poses(obj, max_sample)
+    best_robot_joint_angles = None
+
+    for ee_pose in ee_poses:
+        best_score = 0
+        robot_joint_angles = robot.ik(robot.end_effector, target_pos=ee_pose[0], target_orient=ee_pose[1], use_current_joint_angles=True)
+        score = get_antipodal_score(robot_joint_angles, pc, normals)
+        if score > best_score and score > min_score:
+            best_score = score
+            best_robot_joint_angles = robot_joint_angles
+    return best_robot_joint_angles
+
+
     # ------ Student answer above -------
 
 

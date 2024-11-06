@@ -35,6 +35,15 @@ def reset():
 
 # ------ TODO Student answer below -------
     # hints: if robot.get_contact_points() is not None, then robot is in collision.
+    for i in range(1000):
+        random_position = np.random.rand(3)
+        random_position[-1] = 0.0
+        moveto(robot, robot_marker, random_position)
+        if robot.get_contact_points() is not None:
+            print("Robot is in collision")
+        else:
+            pos = robot.get_base_pos_orient()[0]
+            m.Shape(m.Sphere(radius=0.01), static=True, collision=False, position=pos, rgba=[1, 0, 0, 1])
 
     # you can draw points to the simulation scene at a position by calling
     # m.Shape(m.Sphere(radius=0.01), static=True, collision=False,

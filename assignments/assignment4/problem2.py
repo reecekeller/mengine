@@ -57,7 +57,12 @@ def get_contact_screw(contact_location, contact_normal):
     """
     # ------ TODO Student answer below -------
 
+    # Compute the contact screw using the contact location and contact normal
     contact_screw = np.zeros(6)
+    am = np.cross(contact_location, contact_normal)
+    contact_screw = np.concatenate((contact_normal, am))
+    
+    return contact_screw
     # ------ Student answer above -------
 
     return contact_screw
