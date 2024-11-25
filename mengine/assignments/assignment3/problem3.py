@@ -2,7 +2,6 @@ import os
 import numpy as np
 import mengine as m
 
-np.random.seed(1001)
 class Node:
     def __init__(self, joint_angles, parent=None):
         self.angles = joint_angles
@@ -161,7 +160,7 @@ def moveto(robot, pos, orient, avoid_collision=False, max_iter=100, max_path_len
 
 
 # Create environment and ground plane
-env = m.Env(seed=1000)
+env = m.Env(seed=1001)
 ground = m.Ground()
 m.visualize_coordinate_frame()
 
