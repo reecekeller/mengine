@@ -14,33 +14,47 @@ env.set_gui_camera(look_at_pos=[0, 0, 0.95])
 orient = m.get_quaternion([np.pi, 0, 0])
 
 
-def sample_spherical(npoints, ndim=3):
-    # write your code here
-    #
-    #
-    return points
+def sample_spherical(npoints, r=0.1):
+
+    points = []
+    normals = []
+    for i in range(npoints):
+        pt = np.random.randn(3)
+        pt = pt / np.linalg.norm(pt, 2) * r
+        points.append(pt)
+        normals.append(-pt / r)
+
+    return np.array(points), np.array(normals)
 
 
-def sample_cube(npoints, ndim=3):
-    # write your code here
-    #
-    #
+def sample_cube(npoints, l=0.2):
 
-    return points
+    points = []
+    normals = []
+    for i in range(npoints):
+        pt = np.random.rand(3) * l - l / 2
+        d = np.random.randint(3)
+        s = np.random.randint(2)
+        pt[d] = l / 2 if s else -l / 2
+        points.append(pt)
+
+        n = np.zeros(3)
+        n[d] = -1 if s else 1
+        normals.append(n)
+
+    return np.array(points), np.array(normals)
 
 
 def find_force_closure_grasp(testobj, mu) -> tuple:
 
-    # write your code here
-    #
-    #
+    # ------ TODO: Student answer below -------
+
+    # ------ Student answer above -------
 
     return contact_positions, contact_normals
 
 
 # Reset simulation env
-
-
 def reset(positions, table_friction=0.5, obj_mass=100, obj_friction=0.5, finger_mass=10.0, obj_type='sphere'):
     # Create environment and ground plane
     env.reset()
@@ -48,7 +62,7 @@ def reset(positions, table_friction=0.5, obj_mass=100, obj_friction=0.5, finger_
 
     # Create table and cube
     table = m.URDF(filename=os.path.join(m.directory, 'table', 'table.urdf'), static=True, position=[
-                   0, 0, 0], orientation=[0, 0, 0, 1], maximal_coordinates=True, scale=1.0)
+                   0, 0, 0], orientation=[0, 0, 0, 1], maximal_coordinates=True)
     table.set_whole_body_frictions(
         lateral_friction=table_friction, spinning_friction=0, rolling_friction=0)
     if obj_type == 'sphere':
@@ -75,13 +89,11 @@ def reset(positions, table_friction=0.5, obj_mass=100, obj_friction=0.5, finger_
 
 
 # visualize force closure grasps in simulation
-
-
 def visualize_grasps(grasps):
     for g in grasps:
         # Reset simulator
         fingers, obj = reset(g['contact_positions'],  g['table_friction'],
-                             g['obj_mass'], g['obj_friction'], g['finger_mass'])
+                             g['obj_mass'], g['obj_friction'], g['finger_mass'], g['obj_type'])
         for i in range(100):
 
             for idx, finger in enumerate(fingers):
@@ -107,11 +119,15 @@ def visualize_grasps(grasps):
 
 def main(testobj, friction=True):
 
-    # parameters to play with
+    # ------ TODO: Parameters to experiment with ------
     obj_mass = 100
     obj_friction = 0.5
     finger_mass = 10.0
     force_magnitude = 1000
+
+    # Also, make sure to play around with changing the friction param passed to this function (True vs. False)!
+
+    # -------------- End of experimenting -------------
     if friction:
         mu = 0.5
     else:
@@ -124,9 +140,6 @@ def main(testobj, friction=True):
     grasps = [dict(contact_positions=1.1*contact_positions, contact_normals=contact_normals,
                    table_friction=0.5, obj_type=testobj, obj_mass=obj_mass, obj_friction=obj_friction, force_magnitude=force_magnitude, finger_mass=finger_mass)]
 
-    # append grasps with other parameters here:
-    # grasps.append()
-
     visualize_grasps(grasps)
 
 
@@ -134,7 +147,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(
         description='Parse different test objects.')
-    parser.add_argument('testobject', type=str,
+    parser.add_argument('testobj', type=str,
 
                         help='Call file either with argument \'sphere\' or \'cube\'.')
     parser.add_argument('friction', type=bool,
@@ -145,7 +158,6 @@ if __name__ == "__main__":
         testobj = args.testobj
         friction = args.friction
     except:
-        print("No testobj specified. Using sphere as default.")
-        testobj = 'sphere'
+        print("No testobj specified. Using sphere and frictionless as default.")
         friction = False
     main(testobj, friction)

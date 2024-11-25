@@ -74,6 +74,7 @@ def get_antipodal_score(robot_joint_angles, pc, normals) -> float:
     robot.control(robot_joint_angles, set_instantly=True)
 
     # ------ TODO Student answer below -------
+<<<<<<< HEAD
     # Hint: example code for computing an antipodal grasp score can be found in lecture12_antipodal.py
     p, o = robot.get_link_pos_orient(robot.end_effector)
     antipodal_region.set_base_pos_orient(p, o)
@@ -87,6 +88,9 @@ def get_antipodal_score(robot_joint_angles, pc, normals) -> float:
     gripper_line_vector = gripper_line_vector / np.linalg.norm(gripper_line_vector)
     if len(normals_in_gripper) > 0:
         score = np.mean(np.abs(np.dot(normals_in_gripper, gripper_line_vector)))
+=======
+    # Hint: example code for computing an antipodal grasp score can be found in lecture13_antipodal.py
+>>>>>>> upstream/main
 
     # ------ Student answer above -------
 
